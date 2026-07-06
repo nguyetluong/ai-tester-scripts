@@ -1,0 +1,266 @@
+{
+  "info": {
+    "_postman_id": "d8355d9d-f9de-4d44-9b1b-6dfd5bca4b01",
+    "name": "Reqres API Tests",
+    "description": "API automation tests for reqres.in",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "https://reqres.in"
+    }
+  ],
+  "item": [
+    {
+      "name": "GET Users Page 2",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/users?page=2",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "users"
+          ],
+          "query": [
+            {
+              "key": "page",
+              "value": "2"
+            }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 200', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test('Response time less than 2000ms', function () {",
+              "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+              "});",
+              "",
+              "pm.test('Page is 2', function () {",
+              "    const body = pm.response.json();",
+              "    pm.expect(body.page).to.eql(2);",
+              "});",
+              "",
+              "pm.test('Data array is not empty', function () {",
+              "    const body = pm.response.json();",
+              "    pm.expect(body.data).to.be.an('array');",
+              "    pm.expect(body.data.length).to.be.above(0);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "POST Create User",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"name\":\"AI Tester\",\n    \"job\":\"QA\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/users",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "users"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 201', function () {",
+              "    pm.response.to.have.status(201);",
+              "});",
+              "",
+              "pm.test('Response contains created user', function () {",
+              "    const body = pm.response.json();",
+              "    pm.expect(body.name).to.eql('AI Tester');",
+              "    pm.expect(body.job).to.eql('QA');",
+              "    pm.expect(body.id).to.exist;",
+              "    pm.expect(body.createdAt).to.exist;",
+              "});",
+              "",
+              "pm.test('Save user id to environment', function () {",
+              "    const body = pm.response.json();",
+              "    pm.environment.set('created_user_id', body.id);",
+              "    pm.expect(pm.environment.get('created_user_id')).to.eql(body.id);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "PUT Update User",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"name\":\"Updated\",\n    \"job\":\"Senior QA\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/users/2",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "users",
+            "2"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 200', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test('Updated values are correct', function () {",
+              "    const body = pm.response.json();",
+              "    pm.expect(body.name).to.eql('Updated');",
+              "    pm.expect(body.job).to.eql('Senior QA');",
+              "});",
+              "",
+              "pm.test('updatedAt exists', function () {",
+              "    const body = pm.response.json();",
+              "    pm.expect(body.updatedAt).to.exist;",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "DELETE User",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/users/2",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "users",
+            "2"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 204', function () {",
+              "    pm.response.to.have.status(204);",
+              "});",
+              "",
+              "pm.test('Response body is empty', function () {",
+              "    pm.expect(pm.response.text()).to.eql('');",
+              "});",
+              "",
+              "pm.test('Remove created user id', function () {",
+              "    pm.environment.unset('created_user_id');",
+              "    pm.expect(pm.environment.get('created_user_id')).to.be.undefined;",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "POST Login",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"email\":\"eve.holt@reqres.in\",\n    \"password\":\"cityslicka\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/login",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "login"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 200', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test('Response contains token', function () {",
+              "    const body = pm.response.json();",
+              "    pm.expect(body.token).to.exist;",
+              "    pm.expect(body.token).to.be.a('string');",
+              "});",
+              "",
+              "pm.test('Save auth token', function () {",
+              "    const body = pm.response.json();",
+              "    pm.environment.set('auth_token', body.token);",
+              "    pm.expect(pm.environment.get('auth_token')).to.eql(body.token);",
+              "});",
+              "",
+              "pm.test('Response time less than 2000ms', function () {",
+              "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+              "});"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
